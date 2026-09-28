@@ -1,63 +1,232 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>CivicConnect</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CivicConnect - My Government</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            max-width: 700px;
-            margin: 50px auto;
-            padding: 20px;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #12355b;
+            color: white;
+            padding: 30px 20px;
             text-align: center;
         }
 
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        header p {
+            margin-top: 10px;
+            font-size: 17px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .search-box h2 {
+            margin-top: 0;
+        }
+
         input {
-            padding: 12px;
-            width: 250px;
+            width: 70%;
+            max-width: 400px;
+            padding: 14px;
+            border: 1px solid #bbb;
+            border-radius: 7px;
             font-size: 16px;
         }
 
         button {
-            padding: 12px 20px;
+            padding: 14px 22px;
+            margin-left: 8px;
+            border: none;
+            border-radius: 7px;
+            background: #1d70b8;
+            color: white;
             font-size: 16px;
             cursor: pointer;
         }
 
-        #result {
+        button:hover {
+            background: #155a91;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .representatives {
             margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin: 5px 0;
+        }
+
+        .office {
+            font-weight: bold;
+            color: #1d70b8;
+        }
+
+        .party {
+            margin: 8px 0;
+        }
+
+        .card a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #1d70b8;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            button {
+                width: 100%;
+                margin-left: 0;
+            }
         }
     </style>
 </head>
 
 <body>
 
+<header>
     <h1>CivicConnect</h1>
+    <p>Know Your Government</p>
+</header>
 
-    <p>Find your elected representatives</p>
+<div class="container">
 
-    <input id="zip" type="text" placeholder="Enter ZIP code">
+    <div class="search-box">
 
-    <button onclick="searchZIP()">Search</button>
+        <h2>Find Your Representatives</h2>
 
-    <div id="result"></div>
+        <p>
+            Enter your ZIP code or full address to find your federal representatives.
+        </p>
 
-    <script>
-        function searchZIP() {
+        <input
+            id="location"
+            type="text"
+            placeholder="ZIP code or address"
+        >
 
-            const zip = document.getElementById("zip").value;
+        <button onclick="findRepresentatives()">
+            Search
+        </button>
 
-            if (zip === "") {
-                document.getElementById("result").innerHTML =
-                    "<p>Please enter a ZIP code.</p>";
-                return;
-            }
+        <div id="message"></div>
 
-            document.getElementById("result").innerHTML =
-                "<h2>Search successful!</h2>" +
-                "<p>ZIP code: " + zip + "</p>";
-        }
-    </script>
+    </div>
+
+    <div id="representatives" class="representatives"></div>
+
+</div>
+
+<script>
+
+function findRepresentatives() {
+
+    const location = document.getElementById("location").value.trim();
+
+    const message = document.getElementById("message");
+
+    const results = document.getElementById("representatives");
+
+    if (location === "") {
+
+        message.innerHTML = "Please enter a ZIP code or address.";
+
+        results.innerHTML = "";
+
+        return;
+    }
+
+    message.innerHTML = "Searching...";
+
+    results.innerHTML = "";
+
+    /*
+       IMPORTANT:
+
+       Your 5 Calls API token should NOT be placed
+       inside this public GitHub Pages file.
+
+       We'll connect this page to a private backend.
+
+       The backend will receive:
+
+       /api/representatives?location=32720
+
+       and then securely contact 5 Calls.
+    */
+
+    message.innerHTML =
+        "Your search was received for: " + location;
+
+    results.innerHTML = `
+        <div class="card">
+            <h3>U.S. Representatives</h3>
+            <p>
+                Your representative information will appear here
+                once the secure API connection is added.
+            </p>
+        </div>
+    `;
+}
+
+</script>
 
 </body>
 </html>
