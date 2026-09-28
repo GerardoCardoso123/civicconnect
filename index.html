@@ -1,232 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CivicConnect - My Government</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            color: #222;
-        }
-
-        header {
-            background: #12355b;
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 36px;
-        }
-
-        header p {
-            margin-top: 10px;
-            font-size: 17px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .search-box {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .search-box h2 {
-            margin-top: 0;
-        }
-
-        input {
-            width: 70%;
-            max-width: 400px;
-            padding: 14px;
-            border: 1px solid #bbb;
-            border-radius: 7px;
-            font-size: 16px;
-        }
-
-        button {
-            padding: 14px 22px;
-            margin-left: 8px;
-            border: none;
-            border-radius: 7px;
-            background: #1d70b8;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #155a91;
-        }
-
-        #message {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
-        .representatives {
-            margin-top: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-        }
-
-        .card img {
-            width: 130px;
-            height: 130px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-bottom: 15px;
-        }
-
-        .card h3 {
-            margin: 5px 0;
-        }
-
-        .office {
-            font-weight: bold;
-            color: #1d70b8;
-        }
-
-        .party {
-            margin: 8px 0;
-        }
-
-        .card a {
-            display: inline-block;
-            margin-top: 10px;
-            color: #1d70b8;
-            text-decoration: none;
-        }
-
-        @media (max-width: 600px) {
-            input {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            button {
-                width: 100%;
-                margin-left: 0;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<header>
-    <h1>CivicConnect</h1>
-    <p>Know Your Government</p>
-</header>
-
-<div class="container">
-
-    <div class="search-box">
-
-        <h2>Find Your Representatives</h2>
-
-        <p>
-            Enter your ZIP code or full address to find your federal representatives.
-        </p>
-
-        <input
-            id="location"
-            type="text"
-            placeholder="ZIP code or address"
-        >
-
-        <button onclick="findRepresentatives()">
-            Search
-        </button>
-
-        <div id="message"></div>
-
-    </div>
-
-    <div id="representatives" class="representatives"></div>
-
-</div>
-
 <script>
 
-function findRepresentatives() {
+async function findRepresentatives() {
 
     const location = document.getElementById("location").value.trim();
-
     const message = document.getElementById("message");
-
     const results = document.getElementById("representatives");
 
-    if (location === "") {
-
+    if (!location) {
         message.innerHTML = "Please enter a ZIP code or address.";
-
         results.innerHTML = "";
-
         return;
     }
 
     message.innerHTML = "Searching...";
-
     results.innerHTML = "";
 
-    /*
-       IMPORTANT:
+    // PUT YOUR 5 CALLS API TOKEN BETWEEN THE QUOTES
+    const API_TOKEN = "PASTE_YOUR_5_CALLS_TOKEN_HERE";
 
-       Your 5 Calls API token should NOT be placed
-       inside this public GitHub Pages file.
+    try {
 
-       We'll connect this page to a private backend.
+        const response = await fetch(
+            "https://api.5calls.org/v1/representatives?address=" +
+            encodeURIComponent(location),
+            {
+                headers: {
+                    "Authorization": "Bearer " + API_TOKEN,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
 
-       The backend will receive:
+        if (!response.ok) {
+            throw new Error("API request failed: " + response.status);
+        }
 
-       /api/representatives?location=32720
+        const data = await response.json();
 
-       and then securely contact 5 Calls.
-    */
+        console.log(data);
 
-    message.innerHTML =
-        "Your search was received for: " + location;
+        const representatives =
+            data.representatives ||
+            data.results ||
+            [];
 
-    results.innerHTML = `
-        <div class="card">
-            <h3>U.S. Representatives</h3>
-            <p>
-                Your representative information will appear here
-                once the secure API connection is added.
-            </p>
-        </div>
-    `;
+        if (representatives.length === 0) {
+            message.innerHTML = "No representatives found.";
+            return;
+        }
+
+        message.innerHTML =
+            "Representatives found for " + location;
+
+        representatives.forEach(rep => {
+
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const name = rep.name || "Unknown";
+            const party = rep.party || "Party unavailable";
+            const photo = rep.photo_url || rep.photo || "";
+            const website = rep.website || "";
+
+            card.innerHTML = `
+                ${
+                    photo
+                    ? `<img src="${photo}" alt="${name}">`
+                    : ""
+                }
+
+                <h3>${name}</h3>
+
+                <p class="party">
+                    ${party}
+                </p>
+
+                ${
+                    website
+                    ? `<a href="${website}" target="_blank">
+                        Official Website
+                       </a>`
+                    : ""
+                }
+            `;
+
+            results.appendChild(card);
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.innerHTML =
+            "Something went wrong connecting to the representative database.";
+
+        results.innerHTML =
+            "<p>Check the browser console for the error.</p>";
+    }
 }
 
 </script>
-
-</body>
-</html>
