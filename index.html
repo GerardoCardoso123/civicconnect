@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CivicConnect</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        input {
+            padding: 12px;
+            width: 250px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>CivicConnect</h1>
+
+    <p>Find your elected representatives</p>
+
+    <input id="zip" type="text" placeholder="Enter ZIP code">
+
+    <button onclick="searchZIP()">Search</button>
+
+    <div id="result"></div>
+
+    <script>
+        function searchZIP() {
+
+            const zip = document.getElementById("zip").value;
+
+            if (zip === "") {
+                document.getElementById("result").innerHTML =
+                    "<p>Please enter a ZIP code.</p>";
+                return;
+            }
+
+            document.getElementById("result").innerHTML =
+                "<h2>Search successful!</h2>" +
+                "<p>ZIP code: " + zip + "</p>";
+        }
+    </script>
+
+</body>
+</html>
