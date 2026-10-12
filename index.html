@@ -1,0 +1,569 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find My Representatives</title>
+
+  <style>
+    :root {
+      --navy: #102a56;
+      --red: #bd1313;
+      --blue-bg: #d7e3ff;
+      --white: #ffffff;
+      --muted: #5c6b82;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--blue-bg);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--navy);
+      color: white;
+      text-align: center;
+      padding: 25px 16px;
+      border-bottom: 5px solid var(--red);
+    }
+
+    header .flag {
+      font-size: 35px;
+    }
+
+    header h1 {
+      margin: 8px 0;
+      font-size: clamp(25px, 5vw, 36px);
+    }
+
+    header p {
+      margin: 0;
+      color: #e4ebfa;
+      line-height: 1.5;
+    }
+
+    main {
+      width: min(680px, 92%);
+      margin: 28px auto;
+    }
+
+    .panel {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 5px 18px rgba(16, 42, 86, 0.13);
+      margin-bottom: 22px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 18px 0 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: 1px solid #b8c7df;
+      border-radius: 9px;
+      outline-color: var(--navy);
+      background: white;
+      color: #182b46;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    button:hover {
+      background: var(--navy);
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    #status {
+      margin-top: 16px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .error {
+      color: #a30e0e;
+      font-weight: bold;
+    }
+
+    .success {
+      color: #17633a;
+    }
+
+    .warning {
+      color: #805000;
+      background: #fff3d5;
+      border-radius: 8px;
+      padding: 12px;
+      line-height: 1.5;
+    }
+
+    .location-info {
+      background: #edf2ff;
+      border-left: 4px solid var(--navy);
+      border-radius: 8px;
+      padding: 15px;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    .rep-card {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: white;
+      padding: 20px;
+      margin-top: 16px;
+      border-radius: 14px;
+      border: 1px solid #d4def0;
+      box-shadow: 0 4px 12px rgba(16, 42, 86, 0.09);
+      overflow-wrap: anywhere;
+    }
+
+    .rep-photo {
+      width: 88px;
+      height: 88px;
+      flex-shrink: 0;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #edf2ff;
+    }
+
+    .rep-details {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .rep-details h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .rep-details p {
+      margin: 7px 0;
+      line-height: 1.5;
+    }
+
+    .party {
+      display: inline-block;
+      background: #edf2ff;
+      color: var(--navy);
+      padding: 4px 9px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .official-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--red);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .official-link:hover {
+      text-decoration: underline;
+    }
+
+    .section-label {
+      margin-top: 28px;
+      border-bottom: 2px solid #c8d5ed;
+      padding-bottom: 10px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--navy);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 440px) {
+      .panel {
+        padding: 18px;
+      }
+
+      .rep-card {
+        padding: 14px;
+        gap: 12px;
+      }
+
+      .rep-photo {
+        width: 65px;
+        height: 65px;
+      }
+
+      .rep-details h3 {
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="flag" aria-hidden="true">🇺🇸</div>
+    <h1>Find My Representatives</h1>
+    <p>Discover who represents you in the United States Congress.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>U.S. Representative Finder</h2>
+      <p>Enter your address to find your U.S. House member and Senators.</p>
+
+      <form id="lookup-form">
+        <label for="address">Your address or ZIP code</label>
+        <input
+          id="address"
+          name="address"
+          type="text"
+          placeholder="Street, city, state, ZIP code"
+          autocomplete="street-address"
+          required
+        >
+
+        <button id="search-button" type="submit">
+          Find My Representatives
+        </button>
+      </form>
+
+      <p class="hint">
+        A full address generally gives a more precise congressional district
+        than a ZIP code alone. Your address is sent to the lookup API when
+        you search.
+      </p>
+
+      <div id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="results" hidden>
+      <div class="panel">
+        <h2>Your Location</h2>
+        <div id="location-info" class="location-info"></div>
+        <div id="accuracy-warning" class="warning" hidden></div>
+      </div>
+
+      <h2 class="section-label">Your Representatives</h2>
+      <div id="representatives"></div>
+    </section>
+  </main>
+
+  <footer>
+    Find My Representatives · Civic education project
+  </footer>
+
+  <script>
+    // ==========================================
+    // 5 CALLS API CONFIGURATION
+    // ==========================================
+
+    const API_URL =
+      "https://api.5calls.org/v1/representatives";
+
+    // Public frontend code is visible to every website visitor.
+    // Paste your own 5 Calls API token between the quotation marks.
+    const API_TOKEN = "f75ea9aec2ff88f32b433843";
+
+    // ==========================================
+    // PAGE ELEMENTS
+    // ==========================================
+
+    const form = document.getElementById("lookup-form");
+    const addressInput = document.getElementById("address");
+    const searchButton = document.getElementById("search-button");
+    const statusBox = document.getElementById("status");
+    const results = document.getElementById("results");
+    const locationInfo = document.getElementById("location-info");
+    const accuracyWarning = document.getElementById("accuracy-warning");
+    const representativesBox = document.getElementById("representatives");
+
+    function showStatus(message, type = "") {
+      statusBox.textContent = message;
+      statusBox.className = type;
+    }
+
+    // Create text elements safely rather than inserting API
+    // response values into HTML strings.
+    function addText(parent, tag, text, className = "") {
+      const element = document.createElement(tag);
+      element.textContent = text;
+
+      if (className) {
+        element.className = className;
+      }
+
+      parent.appendChild(element);
+      return element;
+    }
+
+    function addDetail(parent, label, value) {
+      const p = document.createElement("p");
+      const strong = document.createElement("strong");
+
+      strong.textContent = label + ": ";
+      p.appendChild(strong);
+      p.appendChild(document.createTextNode(String(value)));
+
+      parent.appendChild(p);
+    }
+
+    function validHttpUrl(value) {
+      try {
+        const url = new URL(value);
+
+        if (url.protocol === "https:" || url.protocol === "http:") {
+          return url.href;
+        }
+      } catch (error) {
+        // Ignore invalid URLs.
+      }
+
+      return null;
+    }
+
+    function makeRepresentativeCard(rep) {
+      const card = document.createElement("article");
+      card.className = "rep-card";
+
+      // Use the official photo when one is available.
+      const photoUrl = validHttpUrl(rep.photoURL || "");
+
+      if (photoUrl) {
+        const photo = document.createElement("img");
+        photo.className = "rep-photo";
+        photo.src = photoUrl;
+        photo.alt = "Photo of " + (rep.name || "representative");
+        photo.loading = "lazy";
+        photo.referrerPolicy = "no-referrer";
+
+        photo.addEventListener("error", () => photo.remove());
+        card.appendChild(photo);
+      }
+
+      const details = document.createElement("div");
+      details.className = "rep-details";
+
+      addText(details, "h3", rep.name || "Unknown");
+
+      addText(
+        details,
+        "span",
+        rep.party || "Party not listed",
+        "party"
+      );
+
+      addDetail(details, "Office", rep.area || "Unknown");
+
+      if (rep.district !== undefined && rep.district !== null) {
+        addDetail(details, "District", rep.district);
+      }
+
+      if (rep.state) {
+        addDetail(details, "State", rep.state);
+      }
+
+      if (rep.reason) {
+        addDetail(details, "Role", rep.reason);
+      }
+
+      const officialUrl = validHttpUrl(rep.url || "");
+
+      if (officialUrl) {
+        const link = document.createElement("a");
+        link.className = "official-link";
+        link.href = officialUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Official Website ↗";
+        details.appendChild(link);
+      }
+
+      card.appendChild(details);
+      return card;
+    }
+
+    // ==========================================
+    // SEARCH FOR REPRESENTATIVES
+    // ==========================================
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const address = addressInput.value.trim();
+
+      if (!address) {
+        showStatus("Please enter your address or ZIP code.", "error");
+        return;
+      }
+
+      if (
+        !API_TOKEN ||
+        API_TOKEN === "PASTE_YOUR_5CALLS_TOKEN_HERE"
+      ) {
+        showStatus(
+          "Add your 5 Calls API token in the JavaScript configuration.",
+          "error"
+        );
+        return;
+      }
+
+      searchButton.disabled = true;
+      searchButton.textContent = "Searching...";
+      results.hidden = true;
+      representativesBox.replaceChildren();
+      showStatus("Searching for your representatives...");
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const url = new URL(API_URL);
+
+        url.searchParams.set("location", address);
+        url.searchParams.set("areas", "US House,US Senate");
+
+        // This request uses the same API endpoint and header
+        // authentication as the original Python code.
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          headers: {
+            "X-5Calls-Token": API_TOKEN
+          },
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            response.status === 401 || response.status === 403
+              ? "The API rejected the request. Check your API token and access."
+              : "The lookup service returned HTTP " + response.status + "."
+          );
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+          showStatus(String(data.error), "error");
+          return;
+        }
+
+        locationInfo.replaceChildren();
+
+        addDetail(locationInfo, "Location", data.location || "Unknown");
+        addDetail(locationInfo, "State", data.state || "Unknown");
+        addDetail(
+          locationInfo,
+          "Congressional District",
+          data.district ?? "Unknown"
+        );
+
+        if (data.lowAccuracy) {
+          accuracyWarning.textContent =
+            "Your location may have low accuracy. ZIP codes can cover " +
+            "multiple congressional districts. Try a full street address.";
+          accuracyWarning.hidden = false;
+        } else {
+          accuracyWarning.hidden = true;
+        }
+
+        const reps = Array.isArray(data.representatives)
+          ? data.representatives
+          : [];
+
+        if (reps.length === 0) {
+          showStatus(
+            "No representatives were found for this location.",
+            "error"
+          );
+          return;
+        }
+
+        reps.forEach((rep) => {
+          representativesBox.appendChild(makeRepresentativeCard(rep));
+        });
+
+        results.hidden = false;
+        showStatus(
+          "Found " + reps.length + " representative(s).",
+          "success"
+        );
+
+      } catch (error) {
+        console.error("Representative lookup error:", error);
+
+        if (error.name === "AbortError") {
+          showStatus(
+            "The request timed out. Please try again.",
+            "error"
+          );
+        } else if (
+          error instanceof TypeError
+        ) {
+          showStatus(
+            "Could not reach the API. This may be a network or browser " +
+            "CORS restriction. Check the browser console for details.",
+            "error"
+          );
+        } else {
+          showStatus(
+            error.message || "An unexpected error occurred.",
+            "error"
+          );
+        }
+      } finally {
+        clearTimeout(timeoutId);
+        searchButton.disabled = false;
+        searchButton.textContent = "Find My Representatives";
+      }
+    });
+  </script>
+</body>
+</html>
